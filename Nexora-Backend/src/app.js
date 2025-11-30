@@ -54,9 +54,7 @@ app.use('/api/v1/subscriptions', subscriptionRouter);
 app.use('/api/v1/dashboard', dashboardRouter);
 app.use('/api/v1/playlist', playlistRouter);
 app.use('/api/v1/watchhistory',watchHistoryRouter);
-app.use("/*", (req, res) => {
-  res.status(404).json({ success: false, message: 'Route not found' });
-});
+
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
