@@ -44,28 +44,19 @@ import dashboardRouter from './routes/dashboard.routes.js';
 import playlistRouter from './routes/playlist.routes.js';
 import watchHistoryRouter from './routes/watchhistory.routes.js';
 //routes declaration
-// safe mount helper to log and catch mount errors (diagnostic)
-const safeMount = (mountPath, router, name) => {
-  try {
-    console.log(`Mounting ${name} at ${mountPath}`);
-    app.use(mountPath, router);
-    console.log(`Mounted ${name} at ${mountPath}`);
-  } catch (err) {
-    console.error(`Failed to mount ${name} at ${mountPath}:`, err);
-    throw err;
-  }
-};
-
-safeMount('/api/v1/users', userRouter, 'userRouter');
-safeMount('/api/v1/videos', videoRouter, 'videoRouter');
-safeMount('/api/v1/videoDetails', videoDetailsRouter, 'videoDetailsRouter');
-safeMount('/api/v1/comments', commentRouter, 'commentRouter');
-safeMount('/api/v1/likes', likeRouter, 'likeRouter');
-safeMount('/api/v1/tweets', tweetRouter, 'tweetRouter');
-safeMount('/api/v1/subscriptions', subscriptionRouter, 'subscriptionRouter');
-safeMount('/api/v1/dashboard', dashboardRouter, 'dashboardRouter');
-safeMount('/api/v1/playlist', playlistRouter, 'playlistRouter');
-safeMount('/api/v1/watchhistory', watchHistoryRouter, 'watchHistoryRouter');
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/videos', videoRouter);
+app.use('/api/v1/videoDetails', videoDetailsRouter);
+app.use('/api/v1/comments', commentRouter);
+app.use('/api/v1/likes', likeRouter);
+app.use('/api/v1/tweets', tweetRouter);
+app.use('/api/v1/subscriptions', subscriptionRouter);
+app.use('/api/v1/dashboard', dashboardRouter);
+app.use('/api/v1/playlist', playlistRouter);
+app.use('/api/v1/watchhistory',watchHistoryRouter);
+app.use("*", (req, res) => {
+  res.status(404).json({ success: false, message: 'Route not found' });
+});
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
