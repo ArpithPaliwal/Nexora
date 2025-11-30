@@ -170,15 +170,21 @@ const loginUser = asyncHandler(async (req, res) => {
     ); // .selcet : in loggedinuser , every data of db is present of tht user except his or her password and refresh token
 
     //write cookies
-    const options = {
-        httpOnly: true, //→ Makes the cookie inaccessible to JavaScript on the frontend (document.cookie).and Ensures cookies are only sent over HTTPS (not plain HTTP).
-        secure: true
+    // const options = {
+    //     httpOnly: true, //→ Makes the cookie inaccessible to JavaScript on the frontend (document.cookie).and Ensures cookies are only sent over HTTPS (not plain HTTP).
+    //     secure: true
+    // };
+    const cookieOptions = {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/'
     };
 
     return res
         .status(200)
-        .cookie('accessToken', accessToken, options)
-        .cookie('refreshToken', refreshToken, options)
+        .cookie('accessToken', accessToken, cookieOptions)
+        .cookie('refreshToken', refreshToken, cookieOptions)
         .json(
             new apiResponse(
                 200,
@@ -244,15 +250,21 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         const { accessToken, newrefreshToken } =
             await generateAccessTokenAndRfereshToken(decodeduser._id);
 
-        const options = {
+        // const options = {
+        //     httpOnly: true,
+        //     secure: true
+        // };
+        const cookieOptions = {
             httpOnly: true,
-            secure: true
+            secure: true,
+            sameSite: 'none',
+            path: '/'
         };
 
         return res
             .status(200)
-            .cookie('accessToken', accessToken, options)
-            .cookie('refreshToken', newrefreshToken, options)
+            .cookie('accessToken', accessToken, cookieOptions)
+            .cookie('refreshToken', newrefreshToken, cookieOptions)
             .json(
                 new apiResponse(
                     200,
@@ -401,10 +413,9 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 const getUserChannelProfile = asyncHandler(async (req, res) => {
     const { _id } = req.params;
 
-     if (!_id) {
-        throw new apiError(400, "User ID is missing in params");
+    if (!_id) {
+        throw new apiError(400, 'User ID is missing in params');
     }
-
 
     const channel = await User.aggregate([
         {
@@ -457,10 +468,9 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 coverImage: 1,
                 avatar: 1,
                 email: 1,
-                isOwner:{
-                    $eq:["$_id",new mongoose.Types.ObjectId(req.user._id)]
+                isOwner: {
+                    $eq: ['$_id', new mongoose.Types.ObjectId(req.user._id)]
                 }
-
             }
         }
     ]);
@@ -477,75 +487,74 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 });
 //watch histroy
 const getWatchHistory = asyncHandler(async (req, res) => {
-  const userId = new mongoose.Types.ObjectId(req.user._id);
+    const userId = new mongoose.Types.ObjectId(req.user._id);
 
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
-  const aggregateQuery = User.aggregate([
-    { $match: { _id: userId } },
+    const aggregateQuery = User.aggregate([
+        { $match: { _id: userId } },
 
-    {
-      $lookup: {
-        from: "videos",
-        localField: "watchHistory",
-        foreignField: "_id",
-        as: "historyVideos",
-        pipeline: [
-          {
+        {
             $lookup: {
-              from: "users",
-              localField: "owner",
-              foreignField: "_id",
-              as: "ownerDetails",
-              pipeline: [
-                { $project: { _id: 1, username: 1, avatar: 1 } }
-              ]
+                from: 'videos',
+                localField: 'watchHistory',
+                foreignField: '_id',
+                as: 'historyVideos',
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: 'users',
+                            localField: 'owner',
+                            foreignField: '_id',
+                            as: 'ownerDetails',
+                            pipeline: [
+                                { $project: { _id: 1, username: 1, avatar: 1 } }
+                            ]
+                        }
+                    },
+                    { $unwind: '$ownerDetails' },
+
+                    {
+                        $project: {
+                            _id: 1,
+                            title: 1,
+                            description: 1,
+                            views: 1,
+                            createdAt: 1,
+                            thumbnail: 1,
+                            videoFile: 1,
+                            publicId: 1,
+                            duration: 1,
+
+                            ownerId: '$ownerDetails._id',
+                            username: '$ownerDetails.username',
+                            avatar: '$ownerDetails.avatar'
+                        }
+                    }
+                ]
             }
-          },
-          { $unwind: "$ownerDetails" },
+        },
 
-          {
-            $project: {
-              _id: 1,
-              title: 1,
-              description: 1,
-              views: 1,
-              createdAt: 1,
-              thumbnail: 1,
-              videoFile: 1,
-              publicId: 1,
-              duration: 1,
+        // Flatten historyVideos
+        { $unwind: '$historyVideos' },
 
-              ownerId: "$ownerDetails._id",
-              username: "$ownerDetails.username",
-              avatar: "$ownerDetails.avatar"
-            }
-          }
-        ]
-      }
-    },
+        { $replaceRoot: { newRoot: '$historyVideos' } }
+    ]);
 
-    // Flatten historyVideos
-    { $unwind: "$historyVideos" },
+    const options = {
+        page,
+        limit
+    };
 
-    { $replaceRoot: { newRoot: "$historyVideos" } }
-  ]);
+    const result = await User.aggregatePaginate(aggregateQuery, options);
 
-  const options = {
-    page,
-    limit,
-    
-  };
-
-  const result = await User.aggregatePaginate(aggregateQuery, options);
-
-  return res
-    .status(200)
-    .json(new apiResponse(200, result, "Watch history fetched successfully"));
+    return res
+        .status(200)
+        .json(
+            new apiResponse(200, result, 'Watch history fetched successfully')
+        );
 });
-
-
 
 export {
     registerUser,
