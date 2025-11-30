@@ -6,7 +6,7 @@ const app = express();
 app.set("trust proxy", 1);
 
 // Allowed origins from env
-const allowedOrigins = process.env.CORS_ORIGIN.split(",");
+const allowedOrigins = process.env.CORS_ORIGIN.split(",").map(origin => origin.trim());
 
 // CORS middleware
 app.use(
