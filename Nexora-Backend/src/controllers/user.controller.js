@@ -210,15 +210,21 @@ const logoutUser = asyncHandler(async (req, res) => {
             new: true
         }
     ); //we currently dont need thus new , it gives the new and updated response value
-    const options = {
-        httpOnly: true, //→ Makes the cookie inaccessible to JavaScript on the frontend (document.cookie).and Ensures cookies are only sent over HTTPS (not plain HTTP).
-        secure: true
+    // const options = {
+    //     httpOnly: true, //→ Makes the cookie inaccessible to JavaScript on the frontend (document.cookie).and Ensures cookies are only sent over HTTPS (not plain HTTP).
+    //     secure: true
+    // };
+    const cookieOptions = {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/'
     };
 
     return res
         .status(200)
-        .clearCookie('accessToken', options)
-        .clearCookie('refreshToken', options)
+        .clearCookie('accessToken', cookieOptions)
+        .clearCookie('refreshToken', cookieOptions)
         .json(new apiResponse(200, {}, 'user loged out'));
 });
 
