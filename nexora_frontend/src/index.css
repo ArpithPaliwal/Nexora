@@ -1,0 +1,50 @@
+@import "tailwindcss";
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--color-body);
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@theme {
+  --color-body:var(--body);
+  /* This links bg-bg to var(--bg) */
+  --color-background: var(--background);
+  /* This links text-text to var(--text) */ 
+  --color-text: var(--text);
+  /* This links text-accent to var(--accent) */
+  --color-accent: var(--accent);
+
+  --color-text1:var(--text1);
+
+  --color-bg-small:var(--bg-small)
+}
+
+@layer base {
+  
+  /* The default theme values (Light) */
+  :root {
+    --body:white;
+    --background: #eaebeb;
+    --text: #000000;
+    --accent: white; 
+    --text1:#4a5565;
+    --bg-small:#eaebeb
+  }
+  
+  /* The Dark theme overrides */
+  /* Ensure you are using the attribute you set on <html>, e.g., [data-theme='dark'] */
+  [data-theme='dark'] { 
+    --body:#0f0f0f;
+    --background: #0f0f0f;
+    --text: #ffffff;
+    --accent: #1b1b1b; 
+    --text1:#6a7282;
+    --bg-small:#1b1b1b;
+  }
+
+ 
+}
