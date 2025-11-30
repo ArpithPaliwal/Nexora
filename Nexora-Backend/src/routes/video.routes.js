@@ -31,13 +31,13 @@ router
         ]),
         publishAVideo
     );
-
+router.route('/v/subscribed').get(getSubscribedVideos);
 router
     .route('/:videoId')
     .get(getVideoById)
     .delete(deleteVideo)
     .patch(upload.single('thumbnail'), updateVideo);
 router.route('/videos/:userId').get(getUserVideos);
-router.route('/v/subscribed').get(getSubscribedVideos);
+
 //router.route('/videos/subscribed').get(getSubscribedVideos); wont work unless kep above the dynamic route of userid , as it it treats both same 
 export default router;
