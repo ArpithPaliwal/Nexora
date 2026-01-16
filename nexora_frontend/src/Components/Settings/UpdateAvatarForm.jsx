@@ -23,7 +23,7 @@ function UpdateAvatarForm() {
 
   const Mutation = useMutation({
     mutationFn: updateAvatar,
-    onSuccess: (data) => {
+    onSuccess: () => {
      
 
       setToast({ type: "success", message: "Avatar updated successfully!" });

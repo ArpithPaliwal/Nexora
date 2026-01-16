@@ -29,7 +29,7 @@ function VideoPlayer({ videoId }) {
     const interval = setInterval(() => {
       if (window.cloudinary && videoRef.current && !playerRef.current) {
         playerRef.current = window.cloudinary.videoPlayer(videoRef.current, {
-          cloud_name: "dhpol6fzb", // replace with your cloud name
+          cloud_name: "dwmdmohlc", // replace with your cloud name
         });
 
         playerRef.current.source(videoId, {

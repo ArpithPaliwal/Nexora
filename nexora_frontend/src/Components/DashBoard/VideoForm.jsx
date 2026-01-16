@@ -118,7 +118,7 @@ const queryClient = useQueryClient()
                 placeholder="Enter your description"
                 className="w-full h-60 border border-gray-300 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-[#0175FE]"
                 {...register("description", {
-                  required: "Email is required",
+                  required: "description is required",
                 })}
               />
               

@@ -19,7 +19,9 @@ api.interceptors.response.use(
         await api.post("/users/refresh-token");
         
         return api(original); 
-      } catch (e) {
+      } catch (err) {
+        console.log(err);
+        
         store.dispatch(logOut());
         window.location.href = "/LoginForm";  // replace navigate()
       }
